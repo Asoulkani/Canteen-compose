@@ -8,9 +8,18 @@ services:
       - allowedOrigins=http://localhost:4200
       - helloMessage=Hello from the simplest api
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health/readiness" ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 40s
   front:
     build: ../Canteen
     image: canteen-app
     ports:
       - "4200:4200"
     restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
